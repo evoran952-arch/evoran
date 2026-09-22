@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" class="lenis lenis-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVORAN - Premium Streetwear</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Oswald:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & Lenis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root { --primary: #ffffff; --accent: #ff0000; --dark: #050505; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark); color: var(--primary); cursor: none; overflow-x: hidden; }
+        h1, h2, h3, .brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; opacity: 0.05; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzPMzMxloWs2AAAACHRSTlMAMwA3M8zMzJ31F4rOAAABsklEQVQ4y2NgQAX8/PyYwHwGBob///8L/v//D+Qz/P//nwHEB/IZGP7/Z4D4//8zwXwGhv///zPA+P///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2cAAgAAAP//7Vk72W7DAAAAAElFTkSuQmCC'); }
+        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
+        .cursor-dot { width: 8px; height: 8px; background-color: white; }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.5); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+        body:hover .cursor-outline.hovered { width: 60px; height: 60px; background-color: rgba(255, 0, 0, 0.1); border-color: #ff0000; mix-blend-mode: difference; }
+        
+        #preloader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .loader-bar { width: 0%; height: 2px; background: #ff0000; transition: width 0.5s ease; }
+        
+        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .magnetic-wrap { display: inline-block; }
+        .page-content { display: none; opacity: 0; }
+        .page-content.active { display: block; opacity: 1; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+        
+        .product-card-img-wrapper { overflow: hidden; }
+        .product-card-img { transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
+        .product-card:hover .product-card-img { transform: scale(1.1); }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee { animation: marquee 20s linear infinite; }
+        .star-btn { background: none; border: none; padding: 0; cursor: pointer; transition: transform 0.2s; position: relative; z-index: 20; }
+        .star-btn:hover { transform: scale(1.2); }
+
+        .contact-grid-bg { background-image: radial-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px); background-size: 30px 30px; }
+        .form-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'JetBrains Mono', monospace; }
+        .form-input:focus { background: rgba(255, 0, 0, 0.05); border-color: #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.1); outline: none; }
+        
+        /* ACTIVE NAV LINK GLOW EFFECT */
+        .nav-link.active, .mobile-nav-link.active {
+            color: #ff0000 !important;
+            text-shadow: 0 0 12px rgba(255, 0, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Subtle Premium Hero Animation without heavy scaling */
+        @keyframes subtleZoom {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .hero-bg-anim { animation: subtleZoom 20s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="text-center">
+            <h1 class="text-6xl font-bold mb-4 tracking-tighter overflow-hidden">
+                <span class="inline-block transform translate-y-full reveal-text">EVORAN</span>
+            </h1>
+            <div class="w-64 h-[1px] bg-gray-800 mx-auto overflow-hidden">
+                <div class="loader-bar h-full bg-red-600"></div>
+            </div>
+            <p id="loading-status" class="mt-2 text-xs text-gray-500 font-mono">INITIALIZING SYSTEM...</p>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="fixed top-24 right-5 text-white bg-black/80 backdrop-blur border border-red-900/50 px-6 py-4 rounded z-50 transform translate-x-full transition-transform duration-500 flex items-center gap-3 shadow-2xl shadow-red-900/20">
+        <span id="notification-icon" class="text-red-500"></span>
+        <span id="notification-message" class="font-medium tracking-wide"></span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full glass z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+            
+            <div class="cursor-pointer flex items-center gap-2 md:gap-3 magnetic-wrap" onclick="navigateTo('home')" data-cursor="-lg">
+                <img src="evoranlogo.jpg" alt="EVORAN Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain rounded-md">
+                <span class="text-xl md:text-3xl font-black tracking-[0.2em] uppercase leading-none relative group block">
+                    EVO<span class="text-red-600 group-hover:text-white transition-colors duration-300">RAN</span>
+                </span>
+            </div>
+            
+            <div class="hidden md:flex gap-12 items-center">
+                <button onclick="navigateTo('home')" data-nav="home" class="nav-link text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors magnetic-wrap">Home</button>
+                <button onclick="navigateTo('shop')" data-nav="shop" class="nav-link text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors magnetic-wrap">Collection</button>
+                <button onclick="navigateTo('reviews')" data-nav="reviews" class="nav-link text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors magnetic-wrap">Reviews</button>
+                <button onclick="navigateTo('contact')" data-nav="contact" class="nav-link text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors magnetic-wrap">Contact</button>
+                <button onclick="toggleCart()" data-nav="cart" class="nav-link text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors magnetic-wrap relative" data-cursor="-lg">
+                    <span class="mr-1">Cart</span>
+                    <span id="cart-count-desktop" class="absolute -top-2 -right-3 text-[10px] text-red-500 font-bold opacity-0 transition-opacity duration-300">0</span>
+                </button>
+            </div>
+            
+            <div class="md:hidden flex items-center gap-5 text-white">
+                <button onclick="toggleCart()" data-nav="cart" class="nav-link relative">
+                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    <span id="cart-count-mobile" class="absolute -top-1 -right-1 bg-red-600 w-2 h-2 rounded-full hidden"></span>
+                </button>
+                <button onclick="toggleMobileMenu()">
+                    <i id="menu-icon" data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="md:hidden bg-black border-t border-gray-800 hidden overflow-hidden">
+            <div class="flex flex-col p-6 space-y-4">
+                <button onclick="navigateTo('home')" data-nav-mobile="home" class="mobile-nav-link text-3xl font-bold uppercase text-gray-400 hover:text-white transition-all text-left">Home</button>
+                <button onclick="navigateTo('shop')" data-nav-mobile="shop" class="mobile-nav-link text-3xl font-bold uppercase text-gray-400 hover:text-white transition-all text-left">Collection</button>
+                <button onclick="navigateTo('reviews')" data-nav-mobile="reviews" class="mobile-nav-link text-3xl font-bold uppercase text-gray-400 hover:text-white transition-all text-left">Reviews</button>
+                <button onclick="navigateTo('contact')" data-nav-mobile="contact" class="mobile-nav-link text-3xl font-bold uppercase text-gray-400 hover:text-white transition-all text-left">Contact</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="bg-[#0a0a0a] text-white w-full h-full md:h-auto md:max-w-5xl md:border md:border-gray-800 overflow-hidden flex flex-col md:flex-row relative">
+            <button onclick="closeProductModal()" class="absolute top-6 right-6 z-10 text-white mix-blend-difference hover:rotate-90 transition-transform duration-300" data-cursor="-lg"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <div class="w-full md:w-1/2 h-1/2 md:h-[80vh] bg-gray-900 overflow-hidden relative group">
+                <img id="modal-image" src="" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50"></div>
+            </div>
+            <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-[#0a0a0a]">
+                <span class="text-red-600 font-bold tracking-[0.3em] text-xs mb-4 block animate-slide-up">EVORAN EXCLUSIVE</span>
+                <h2 id="modal-name" class="text-4xl md:text-6xl font-black mb-4 uppercase leading-none animate-slide-up"></h2>
+                <p id="modal-price" class="text-2xl md:text-3xl text-gray-400 font-light mb-8 animate-slide-up"></p>
+                <p id="modal-description" class="text-gray-500 mb-10 leading-relaxed max-w-sm animate-slide-up"></p>
+                <div class="flex items-center gap-6 mb-10 animate-slide-up">
+                    <div class="flex items-center border border-gray-700">
+                        <button onclick="decreaseModalQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-colors"><i data-lucide="minus" class="w-4 h-4"></i></button>
+                        <span id="modal-quantity" class="w-12 text-center font-bold text-lg">1</span>
+                        <button onclick="increaseModalQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+                <button onclick="addToCartFromModal()" class="w-full bg-white text-black py-4 text-sm font-bold tracking-[0.2em] uppercase hover:bg-red-600 hover:text-white transition-all duration-300 magnetic-wrap animate-slide-up" data-cursor="-lg"><span id="modal-add-button-text">Add to Cart</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed inset-0 z-50 pointer-events-none">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-500" id="cart-overlay" onclick="toggleCart()"></div>
+        <div class="absolute top-0 right-0 h-full w-full max-w-md bg-[#050505] transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] flex flex-col border-l border-gray-800" id="cart-panel">
+            <div class="p-8 border-b border-gray-800 flex justify-between items-center">
+                <h2 class="text-2xl font-bold uppercase tracking-widest">Cart <span id="cart-items-count" class="text-red-600 text-sm align-top">0</span></h2>
+                <button onclick="toggleCart()" class="hover:text-red-500 transition-colors pointer-events-auto"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8 space-y-6 pointer-events-auto" id="cart-content"></div>
+            <div id="cart-footer" class="p-8 border-t border-gray-800 bg-[#0a0a0a] pointer-events-auto hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        
+        <!-- HOME PAGE -->
+        <div id="home-page" class="page-content active">
+            <div class="relative h-[80vh] md:h-screen flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 z-0 bg-black">
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black z-10"></div>
+                   <video id="hero-bg" class="w-full h-full object-cover object-top md:object-center hero-bg-anim" autoplay loop muted playsinline>
+    <source src="hero-animation.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+                </div>
+                <div class="relative z-20 text-center px-4 mt-16 md:mt-0">
+                    <p class="text-sm md:text-base font-bold tracking-[0.5em] text-red-500 mb-4 opacity-0 hero-anim drop-shadow-xl">EST. 2026</p>
+                    <h1 class="text-6xl md:text-9xl font-black uppercase tracking-tighter mb-2 leading-none opacity-0 hero-anim overflow-hidden drop-shadow-2xl">
+                        EVO<span class="text-stroke text-transparent" style="-webkit-text-stroke: 2px white;">RAN</span>
+                    </h1>
+                    <p class="text-lg md:text-2xl font-light tracking-[0.3em] text-gray-200 mb-12 opacity-0 hero-anim drop-shadow-lg">DEFINE YOUR LEGACY</p>
+                    <div class="opacity-0 hero-anim">
+                        <button onclick="navigateTo('shop')" class="group relative px-8 py-4 md:px-10 bg-white text-black font-bold uppercase tracking-widest overflow-hidden magnetic-wrap shadow-2xl shadow-white/10" data-cursor="-lg">
+                            <span class="relative z-10 group-hover:text-white transition-colors duration-300">Explore Collection</span>
+                            <div class="absolute inset-0 bg-red-600 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300 ease-out"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-red-600 py-4 overflow-hidden -rotate-1 transform scale-105 z-20 relative border-y-4 border-black">
+                <div class="whitespace-nowrap flex gap-10 animate-marquee">
+                    <span class="text-4xl font-black uppercase italic tracking-tighter text-black">New Season Drop • Premium Quality • Streetwear Redefined • EVORAN 2026 • </span>
+                    <span class="text-4xl font-black uppercase italic tracking-tighter text-black">New Season Drop • Premium Quality • Streetwear Redefined • EVORAN 2026 • </span>
+                </div>
+            </div>
+
+            <div class="bg-black py-32 px-4 relative z-10">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-end mb-20 px-4 gsap-fade-up">
+                        <div>
+                            <span class="text-red-600 tracking-[0.3em] text-sm font-bold block mb-2">CURATED</span>
+                            <h2 class="text-5xl md:text-7xl font-bold uppercase text-white">Featured<br><span class="text-gray-800">Drops</span></h2>
+                        </div>
+                        <button onclick="navigateTo('shop')" class="hidden md:flex items-center gap-2 text-white hover:text-red-500 transition-colors uppercase tracking-widest text-sm font-bold group" data-cursor="-hover">
+                            View All <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-2"></i>
+                        </button>
+                    </div>
+                    <div id="featured-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 gsap-fade-up">
+                        <!-- Dynamic Content Here -->
+                    </div>
+                    <div class="text-center mt-12 md:hidden">
+                        <button onclick="navigateTo('shop')" class="inline-flex items-center gap-2 text-white hover:text-red-500 transition-colors uppercase tracking-widest text-sm font-bold">
+                            View All Collection <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PREMIUM PHILOSOPHY SECTION -->
+            <div class="py-32 bg-[#050505] relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-1/2 h-full bg-gray-900/10 skew-x-12 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-red-900/10 blur-[100px] pointer-events-none"></div>
+
+                <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-start relative z-10">
+                    <div class="gsap-fade-up md:sticky md:top-32">
+                        <img src="https://i.pinimg.com/736x/33/82/cb/3382cbe05aa49a045d2d227b97a40cb5.jpg" alt="Style" class="grayscale hover:grayscale-0 transition-all duration-700 rounded-sm shadow-2xl shadow-red-900/20 mb-6">
+                        <div class="border border-gray-800 p-6 bg-black/50 backdrop-blur-sm">
+                            <h3 class="text-white font-bold uppercase tracking-widest mb-2">The EVORAN Standard</h3>
+                            <p class="text-gray-500 text-xs">No Compromise. No shortcuts. Just pure aesthetic dominance.</p>
+                        </div>
+                    </div>
+
+                    <div class="gsap-fade-up">
+                        <h2 class="text-5xl md:text-7xl font-black mb-8 leading-[0.9] uppercase">
+                            NOT JUST CLOTHING. <br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900">IT'S A REVOLUTION.</span>
+                        </h2>
+                        <div class="mb-12 border-l-4 border-red-600 pl-6 py-2">
+                            <p class="text-gray-300 text-lg md:text-xl leading-relaxed font-light">
+                                "Born in the shadows of the concrete jungle, EVORAN merges high-fashion aesthetics with raw street culture. We do not follow trends; we forge the path for the few who dare to define their own legacy."
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-10">
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-red-600 group-hover:border-red-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-red-500 transition-colors">Authentic Quality</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Crafted with the finest heavyweight fabrics to ensure longevity. We engineer our garments to survive the chaos of the city.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="scissors" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-white transition-colors">Precision Tailoring</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Cut and sewn with obsessive attention to detail. Our fits are designed to drape perfectly, offering a silhouette that commands authority.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="gem" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-white transition-colors">Limited Exclusivity</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">We don't mass produce. Each drop is limited in quantity, ensuring that when you wear EVORAN, you are part of an exclusive circle.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="zap" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-white transition-colors">Avant-Garde Design</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Graphics that challenge the norm. We mix cyberpunk aesthetics with minimalistic grunge to create visual statements that turn heads.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="fingerprint" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-white transition-colors">Unapologetic Identity</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">EVORAN is not for everyone, and that is by design. It is for the rebels, the dreamers, and the ones who write their own rules.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start group">
+                                <div class="w-14 h-14 shrink-0 border border-gray-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg shadow-black/50">
+                                    <i data-lucide="globe" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2 uppercase tracking-wider group-hover:text-white transition-colors">Global Movement</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">From the streets of Dhaka to the world stage. We are building a community united by style, substance, and the drive to evolve.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOP PAGE -->
+        <div id="shop-page" class="page-content">
+            <div class="pt-32 pb-16 px-6 bg-black min-h-screen">
+                <div class="max-w-7xl mx-auto">
+                    <div class="text-center mb-20 gsap-fade-up">
+                        <h1 class="text-6xl md:text-8xl font-black uppercase mb-6 tracking-tighter">Collection</h1>
+                        <div id="category-filters" class="flex justify-center gap-4 flex-wrap">
+                            <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 border border-white text-black bg-white text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-all" data-category="all">All</button>
+                        </div>
+                    </div>
+                    <div id="products-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 md:gap-x-8 md:gap-y-16">
+                        <!-- Dynamic Content Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVIEWS PAGE -->
+        <div id="reviews-page" class="page-content">
+            <div class="pt-32 pb-16 px-6 bg-black min-h-screen">
+                <div class="max-w-7xl mx-auto">
+                    <div class="grid md:grid-cols-3 gap-16 mb-24">
+                        <div class="md:col-span-1 gsap-fade-up">
+                            <span class="text-red-600 tracking-[0.3em] font-bold block mb-4">COMMUNITY</span>
+                            <h1 class="text-5xl md:text-6xl font-black uppercase mb-6 leading-none">Client<br>Feedback</h1>
+                            <p class="text-gray-400 mb-8 text-sm">Join the legacy. Tell us about your EVORAN experience.</p>
+                            
+                            <div class="bg-[#0a0a0a] border border-gray-800 p-8 shadow-2xl shadow-red-900/10">
+                                <form onsubmit="submitReview(event)" class="space-y-4">
+                                    <div class="mb-2">
+                                        <label class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 block">Rating</label>
+                                        <div class="flex gap-2 text-gray-700 cursor-pointer star-rating relative z-50" id="star-container">
+                                            <button type="button" class="star-btn" onclick="setRating(1)"><i data-lucide="star" class="w-6 h-6 transition-colors"></i></button>
+                                            <button type="button" class="star-btn" onclick="setRating(2)"><i data-lucide="star" class="w-6 h-6 transition-colors"></i></button>
+                                            <button type="button" class="star-btn" onclick="setRating(3)"><i data-lucide="star" class="w-6 h-6 transition-colors"></i></button>
+                                            <button type="button" class="star-btn" onclick="setRating(4)"><i data-lucide="star" class="w-6 h-6 transition-colors"></i></button>
+                                            <button type="button" class="star-btn" onclick="setRating(5)"><i data-lucide="star" class="w-6 h-6 transition-colors"></i></button>
+                                        </div>
+                                        <input type="hidden" id="review-rating" value="5">
+                                    </div>
+                                    <input type="text" id="review-name" placeholder="YOUR NAME" required class="w-full bg-black border border-gray-800 p-3 text-white text-sm focus:outline-none focus:border-red-600 transition-colors uppercase">
+                                    <textarea id="review-comment" placeholder="YOUR REVIEW" rows="3" required class="w-full bg-black border border-gray-800 p-3 text-white text-sm focus:outline-none focus:border-red-600 transition-colors resize-none"></textarea>
+                                    <button type="submit" class="w-full bg-white text-black py-3 font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">Submit Review</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <div id="reviews-grid" class="grid md:grid-cols-2 gap-6 gsap-fade-up">
+                                <p class="text-gray-500">Loading reviews...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT PAGE -->
+        <div id="contact-page" class="page-content">
+            <div class="pt-32 pb-24 px-6 bg-black min-h-screen relative overflow-hidden contact-grid-bg">
+                <div class="max-w-7xl mx-auto relative z-10">
+                    <div class="mb-20 gsap-fade-up">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+                            </span>
+                            <span class="mono text-xs text-red-600 tracking-[0.3em] uppercase">System Status: Active</span>
+                        </div>
+                        <h1 class="text-7xl md:text-9xl font-black uppercase tracking-tighter leading-none cursor-default">
+                            Establish<br><span class="text-transparent" style="-webkit-text-stroke: 1.5px white;">Connection</span>
+                        </h1>
+                    </div>
+                    <div class="grid lg:grid-cols-12 gap-12 lg:gap-20">
+                        <div class="lg:col-span-5 space-y-8 gsap-fade-up">
+                            <p class="text-gray-400 text-lg leading-relaxed max-w-md">Reach out to us for orders, collaborations, or global inquiries.</p>
+                            <div class="grid gap-4">
+                                <a href="https://wa.me/8801604954097" target="_blank" class="group relative flex items-center gap-6 p-8 bg-[#0a0a0a] border border-white/5 hover:border-green-600/50 transition-all duration-500 cursor-pointer">
+                                    <div class="absolute top-0 left-0 w-1 h-full bg-green-600 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500"></div>
+                                    <div class="w-14 h-14 rounded-full bg-green-600/10 flex items-center justify-center text-green-500 group-hover:bg-green-600 group-hover:text-white transition-all"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
+                                    <div><span class="mono text-[10px] text-gray-500 uppercase mb-1 block">WhatsApp</span><h3 class="text-xl font-bold uppercase">+880 1604-954097</h3></div>
+                                </a>
+                                <a href="mailto:evoran952@gmail.com" class="group relative flex items-center gap-6 p-8 bg-[#0a0a0a] border border-white/5 hover:border-red-600/50 transition-all duration-500 cursor-pointer">
+                                    <div class="absolute top-0 left-0 w-1 h-full bg-red-600 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500"></div>
+                                    <div class="w-14 h-14 rounded-full bg-red-600/10 flex items-center justify-center text-red-500 group-hover:bg-red-600 group-hover:text-white transition-all"><i data-lucide="mail" class="w-6 h-6"></i></div>
+                                    <div><span class="mono text-[10px] text-gray-500 uppercase mb-1 block">Email</span><h3 class="text-xl font-bold uppercase">evoran952@gmail.com</h3></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 bg-[#0a0a0a] border border-white/10 p-10 md:p-14 gsap-fade-up">
+                            <form id="contact-form" onsubmit="submitContact(event)" class="space-y-8">
+                                <div class="grid md:grid-cols-2 gap-8">
+                                    <div class="space-y-2"><label class="mono text-[10px] text-gray-500 uppercase ml-1">Name</label><input type="text" id="contact-name" required placeholder="GUEST_USER" class="w-full form-input p-4 text-white text-sm mono"></div>
+                                    <div class="space-y-2"><label class="mono text-[10px] text-gray-500 uppercase ml-1">Email</label><input type="email" id="contact-email" required placeholder="USER@DOMAIN.COM" class="w-full form-input p-4 text-white text-sm mono"></div>
+                                </div>
+                                <div class="space-y-2"><label class="mono text-[10px] text-gray-500 uppercase ml-1">Transmission</label><textarea id="contact-message" rows="5" required placeholder="ENTER MESSAGE..." class="w-full form-input p-4 text-white text-sm mono resize-none"></textarea></div>
+                                <button type="submit" class="w-full bg-white text-black py-5 font-black uppercase tracking-[0.3em] hover:bg-red-600 hover:text-white transition-all duration-500 shadow-xl flex items-center justify-center gap-3 group magnetic-wrap" data-cursor="-lg">Send Message <i data-lucide="send" class="w-4 h-4 group-hover:translate-x-2 transition-transform"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#050505] border-t border-gray-900 pt-20 pb-10 px-6 relative z-20">
+        <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+            <img src="evoranlogo.jpg" alt="EVORAN Logo" class="w-16 h-16 mb-6 object-contain rounded-lg">
+            
+            <h2 class="text-7xl md:text-9xl font-black text-gray-900 uppercase tracking-tighter mb-8 select-none hover:text-red-900 transition-colors duration-500 cursor-default">EVORAN</h2>
+            <div class="flex gap-8 mb-12">
+                <a href="https://www.youtube.com/@Evoran-r2c" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors"><i data-lucide="youtube" class="w-6 h-6"></i></a>
+                <a href="https://www.facebook.com/profile.php?id=61581798921211" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+            </div>
+            <p class="text-xs text-gray-600 uppercase tracking-widest">© 2026 EVORAN. Premium Streetwear. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/8801604954097" target="_blank" rel="noopener noreferrer" 
+       class="fixed bottom-6 right-6 z-[90] hover:scale-110 transition-transform duration-300 flex items-center justify-center magnetic-wrap cursor-pointer group" data-cursor="-lg">
+        <img src="https://i.ibb.co.com/1ttzKV9X/image.png" alt="WhatsApp" class="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-[0_0_15px_rgba(37,211,102,0.3)] group-hover:drop-shadow-[0_0_25px_rgba(37,211,102,0.6)] group-hover:animate-pulse">
+    </a>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCzscVpB0jNFcA1ZWBtIKka4equ5fkPZZE",
+            authDomain: "evoran-admin.firebaseapp.com",
+            databaseURL: "https://evoran-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "evoran-admin",
+            storageBucket: "evoran-admin.firebasestorage.app",
+            messagingSenderId: "937959335179",
+            appId: "1:937959335179:web:ea8519af33edf7568bee0e",
+            measurementId: "G-1ZPFGQNWK6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let products = [];
+        let categories = [];
+        let state = {
+            cart: JSON.parse(localStorage.getItem('evoran_cart_premium')) || [],
+            currentPage: 'home',
+            modalProduct: null,
+            modalQuantity: 1,
+            selectedCategory: 'all',
+            currentRating: 5
+        };
+
+        const lenis = new Lenis({ duration: 1.2, smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+        gsap.registerPlugin(ScrollTrigger);
+
+        function init() {
+            lucide.createIcons();
+            initCursor();
+            fetchData();
+            updateCartUI();
+            initMagneticButtons();
+            initStarRating();
+            updateActiveNav('home');
+        }
+
+        function updateActiveNav(target) {
+            const currentTarget = target || state.currentPage;
+            document.querySelectorAll('[data-nav]').forEach(btn => {
+                if (btn.getAttribute('data-nav') === currentTarget) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('[data-nav-mobile]').forEach(btn => {
+                if (btn.getAttribute('data-nav-mobile') === currentTarget) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function initScrollAnimations() {
+            gsap.to("#hero-bg", {
+                yPercent: 20,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#home-page",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+
+            document.querySelectorAll('.gsap-fade-up').forEach((el) => {
+                gsap.fromTo(el, 
+                    { y: 40, opacity: 0 },
+                    { 
+                        y: 0, opacity: 1, duration: 1, ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
+                    }
+                );
+            });
+            ScrollTrigger.refresh();
+        }
+
+        function initPreloader() {
+            const tl = gsap.timeline();
+            tl.to('.loader-bar', { width: '100%', duration: 1.5, ease: 'power2.inOut' })
+              .to('.reveal-text', { y: 0, duration: 1, ease: 'power4.out' }, "-=0.5")
+              .to('#preloader', { y: '-100%', duration: 1.2, ease: 'power4.inOut', delay: 0.5 })
+              .from('.hero-anim', { y: 50, opacity: 0, stagger: 0.15, duration: 1.2, ease: 'power3.out' }, "-=0.8")
+              .call(initScrollAnimations); 
+        }
+
+        function fetchData() {
+            document.getElementById('loading-status').innerText = "LOADING SYSTEM...";
+            
+            const catPromise = db.ref('categories').once('value').then(snap => {
+                const data = snap.val();
+                categories = data ? Object.values(data) : [];
+                renderCategoryFilters();
+            });
+
+            const prodPromise = db.ref('products').once('value').then(snap => {
+                const data = snap.val();
+                products = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+                renderFeaturedProducts();
+                renderShopProducts();
+            });
+            
+            db.ref('reviews').on('value', snap => {
+                const data = snap.val();
+                renderReviews(data);
+            });
+
+            Promise.all([catPromise, prodPromise]).then(() => {
+                initPreloader();
+            }).catch(err => {
+                console.error(err);
+                document.getElementById('loading-status').innerText = "CONNECTION ERROR.";
+            });
+        }
+
+        function initStarRating() {
+            setRating(5); 
+        }
+
+        function setRating(n) {
+            state.currentRating = n;
+            document.getElementById('review-rating').value = n;
+            const btns = document.querySelectorAll('.star-btn');
+            
+            btns.forEach((btn, index) => {
+                const svg = btn.querySelector('svg');
+                if(!svg) return;
+                if(index < n) {
+                    svg.style.fill = '#ff0000';
+                    svg.style.color = '#ff0000';
+                } else {
+                    svg.style.fill = 'none';
+                    svg.style.color = '#4b5563'; 
+                }
+            });
+        }
+
+        function submitReview(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "POSTING...";
+            
+            const reviewData = {
+                name: document.getElementById('review-name').value,
+                rating: state.currentRating,
+                comment: document.getElementById('review-comment').value,
+                timestamp: Date.now()
+            };
+
+            db.ref('reviews').push(reviewData).then(() => {
+                showNotification("Review Posted");
+                e.target.reset();
+                setRating(5);
+                btn.innerText = "SUBMITTED";
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
+
+        function renderReviews(data) {
+            const container = document.getElementById('reviews-grid');
+            if (!data) {
+                container.innerHTML = `<p class="col-span-full text-gray-500 italic">No reviews yet. Be the first.</p>`;
+                return;
+            }
+
+            const reviews = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse();
+            
+            container.innerHTML = reviews.map(r => {
+                let starsHTML = '';
+                for(let i=0; i<5; i++) {
+                    starsHTML += `<i data-lucide="star" class="w-3 h-3 ${i < r.rating ? 'fill-red-600 text-red-600' : 'text-gray-700'}"></i>`;
+                }
+
+                let replyHTML = '';
+                if(r.reply) {
+                    replyHTML = `
+                        <div class="mt-4 pt-4 border-t border-gray-800 ml-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-bold bg-white text-black px-1 uppercase">Official Response</span>
+                            </div>
+                            <p class="text-xs text-gray-400 italic">"${r.reply}"</p>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-[#0a0a0a] border border-gray-800 p-6 flex flex-col h-full relative group hover:border-red-900 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex gap-1">${starsHTML}</div>
+                            <span class="text-[10px] text-gray-600 font-mono">${new Date(r.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <h3 class="font-bold text-white uppercase text-sm mb-2">${r.name}</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-auto">"${r.comment}"</p>
+                        ${replyHTML}
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
+            container.innerHTML = `<button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 border border-white text-black bg-white text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-all" data-category="all">All</button>`;
+            categories.forEach(cat => {
+                container.innerHTML += `
+                    <button onclick="filterProducts('${cat.id}')" class="filter-btn px-6 py-2 border border-gray-800 text-gray-400 text-xs font-bold uppercase tracking-widest hover:border-white hover:text-white transition-all" data-category="${cat.id}">${cat.name}</button>
+                `;
+            });
+        }
+
+        function submitContact(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML; 
+            
+            btn.innerHTML = '<span class="animate-pulse">SENDING...</span>';
+            btn.classList.add('bg-gray-500', 'cursor-not-allowed');
+            
+            const newMsgRef = db.ref('messages').push();
+            newMsgRef.set({
+                name: document.getElementById('contact-name').value,
+                email: document.getElementById('contact-email').value,
+                message: document.getElementById('contact-message').value,
+                timestamp: Date.now(),
+                dateReadable: new Date().toLocaleString()
+            }).then(() => {
+                showNotification("Transmission Success");
+                document.getElementById('contact-form').reset();
+                
+                btn.innerHTML = 'SENT';
+                btn.classList.remove('bg-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-green-600', 'text-white');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove('bg-green-600', 'text-white');
+                }, 3000);
+            }).catch((error) => {
+                console.error("Error:", error);
+                btn.innerHTML = 'ERROR';
+                setTimeout(() => { btn.innerHTML = originalContent; }, 3000);
+            });
+        }
+
+        function navigateTo(page) {
+            if (state.currentPage === page) return;
+            const currentContent = document.getElementById(`${state.currentPage}-page`);
+            const nextContent = document.getElementById(`${page}-page`);
+            
+            gsap.to(currentContent, { opacity: 0, duration: 0.4, onComplete: () => {
+                currentContent.classList.remove('active');
+                nextContent.classList.add('active');
+                state.currentPage = page;
+                updateActiveNav(page);
+                lenis.scrollTo(0, { immediate: true });
+                if(page === 'shop') renderShopProducts();
+                if(page === 'contact') lucide.createIcons(); 
+                
+                gsap.fromTo(nextContent, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
+                
+                setTimeout(() => {
+                    initScrollAnimations();
+                }, 100);
+            }});
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function renderFeaturedProducts() {
+            const container = document.getElementById('featured-products');
+            const featured = products.filter(p => p.featured).slice(0, 4);
+            container.innerHTML = featured.length ? featured.map(p => createProductCard(p)).join('') : '<p class="text-gray-500">Coming soon.</p>';
+            lucide.createIcons();
+        }
+
+        function renderShopProducts() {
+            const container = document.getElementById('products-grid');
+            const filtered = state.selectedCategory !== 'all' ? products.filter(p => p.category === state.selectedCategory) : products;
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-gray-500 py-20">No items found in this category.</p>`;
+            } else {
+                container.innerHTML = filtered.map(p => createProductCard(p)).join('');
+            }
+            lucide.createIcons();
+            document.querySelectorAll('.product-card').forEach(el => {
+                el.addEventListener('mouseenter', () => document.querySelector('.cursor-outline').classList.add('hovered'));
+                el.addEventListener('mouseleave', () => document.querySelector('.cursor-outline').classList.remove('hovered'));
+            });
+            ScrollTrigger.refresh();
+        }
+
+        function createProductCard(product) {
+            return `
+                <div class="group cursor-pointer product-card" onclick="showProductModal('${product.id}')">
+                    <div class="product-card-img-wrapper relative aspect-[3/4] bg-gray-900 mb-4 overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="product-card-img w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="border border-white text-white px-6 py-3 text-xs font-bold uppercase tracking-widest transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 backdrop-blur-sm bg-black/30">View</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-white font-bold uppercase text-base md:text-lg leading-tight mb-1 group-hover:text-red-500 transition-colors">${product.name}</h3>
+                            <p class="text-gray-500 text-[10px] md:text-xs tracking-wider uppercase">${product.category}</p>
+                        </div>
+                        <span class="text-white font-bold text-sm md:text-base">৳${product.price}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showProductModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            state.modalProduct = product;
+            state.modalQuantity = 1;
+            document.getElementById('modal-image').src = product.image;
+            document.getElementById('modal-name').innerText = product.name;
+            document.getElementById('modal-price').innerText = `৳${product.price}`;
+            document.getElementById('modal-description').innerText = product.description || "No description available.";
+            document.getElementById('modal-quantity').innerText = 1;
+            updateModalButtonText();
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('pointer-events-none');
+            gsap.to(modal, { opacity: 1, duration: 0.3 });
+            gsap.fromTo('.animate-slide-up', { y: 30, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, delay: 0.2 });
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => modal.classList.add('pointer-events-none') });
+        }
+
+        function increaseModalQuantity() { state.modalQuantity++; document.getElementById('modal-quantity').innerText = state.modalQuantity; updateModalButtonText(); }
+        function decreaseModalQuantity() { if (state.modalQuantity > 1) { state.modalQuantity--; document.getElementById('modal-quantity').innerText = state.modalQuantity; updateModalButtonText(); } }
+        function updateModalButtonText() { document.getElementById('modal-add-button-text').innerText = `Add to Cart - ৳${state.modalProduct.price * state.modalQuantity}`; }
+        
+        function addToCartFromModal() { 
+            addToCart(state.modalProduct, state.modalQuantity); 
+            closeProductModal(); 
+            gsap.fromTo('#cart-count-desktop', {scale: 2}, {scale: 1, duration: 0.5, ease: "elastic.out(1, 0.3)"});
+        }
+        
+        function addToCart(product, quantity = 1) {
+            const existing = state.cart.find(item => item.id === product.id);
+            if (existing) existing.quantity += quantity; else state.cart.push({ ...product, quantity });
+            saveCart(); showNotification(`${product.name} Added`);
+        }
+        
+        function removeFromCart(id) { state.cart = state.cart.filter(item => item.id !== id); saveCart(); }
+        function saveCart() { localStorage.setItem('evoran_cart_premium', JSON.stringify(state.cart)); updateCartUI(); }
+        
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const isOpen = sidebar.style.pointerEvents === 'auto';
+            if (!isOpen) { 
+                sidebar.style.pointerEvents = 'auto'; 
+                document.getElementById('cart-overlay').style.opacity = '1'; 
+                document.getElementById('cart-panel').style.transform = 'translateX(0)'; 
+                updateActiveNav('cart');
+            } else { 
+                sidebar.style.pointerEvents = 'none'; 
+                document.getElementById('cart-overlay').style.opacity = '0'; 
+                document.getElementById('cart-panel').style.transform = 'translateX(100%)'; 
+                updateActiveNav(state.currentPage);
+            }
+        }
+        
+        function updateCartUI() {
+            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('cart-count-desktop').innerText = count;
+            document.getElementById('cart-count-desktop').style.opacity = count > 0 ? 1 : 0;
+            
+            const mobileCount = document.getElementById('cart-count-mobile');
+            if(count > 0) mobileCount.classList.remove('hidden');
+            else mobileCount.classList.add('hidden');
+            
+            document.getElementById('cart-items-count').innerText = count;
+            const content = document.getElementById('cart-content');
+            if (state.cart.length === 0) {
+                content.innerHTML = `<div class="text-center text-gray-500 mt-20">Your cart is empty</div>`;
+                document.getElementById('cart-footer').style.display = 'none';
+            } else {
+                content.innerHTML = state.cart.map(item => `<div class="flex gap-4 mb-6"><img src="${item.image}" class="w-20 h-24 object-cover bg-gray-800"><div class="flex-1"><h4 class="font-bold text-white uppercase text-sm mb-1">${item.name}</h4><p class="text-xs text-gray-500 mb-2">৳${item.price} x ${item.quantity}</p><button onclick="removeFromCart('${item.id}')" class="text-xs text-red-500 underline hover:text-white transition-colors">REMOVE</button></div><span class="font-bold text-white">৳${item.price * item.quantity}</span></div>`).join('');
+                const footer = document.getElementById('cart-footer');
+                footer.style.display = 'block';
+                footer.innerHTML = `<div class="flex justify-between text-xl font-bold mb-6 text-white"><span>TOTAL</span><span>৳${total}</span></div><button onclick="checkoutWhatsApp()" class="w-full bg-green-600 text-white py-4 font-bold uppercase tracking-widest hover:bg-green-700 transition-colors">Checkout on WhatsApp</button>`;
+            }
+        }
+        
+        function checkoutWhatsApp() { if (state.cart.length === 0) return; const msg = state.cart.map(i => `${i.name} (x${i.quantity}) - ৳${i.price * i.quantity}`).join('%0A'); const total = state.cart.reduce((sum, i) => sum + (i.price * i.quantity), 0); window.open(`https://wa.me/8801604954097?text=New Order:%0A${msg}%0A%0ATotal: ৳${total}`, '_blank'); }
+        
+        function showNotification(msg) { const notif = document.getElementById('notification'); document.getElementById('notification-message').innerText = msg; document.getElementById('notification-icon').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>'; lucide.createIcons(); gsap.to(notif, { x: 0, duration: 0.5, ease: 'back.out(1.7)' }); setTimeout(() => gsap.to(notif, { x: '120%', duration: 0.5, ease: 'power2.in' }), 3000); }
+        
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+        
+        function filterProducts(cat) { 
+            state.selectedCategory = cat; 
+            renderShopProducts(); 
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.dataset.category === cat) {
+                    btn.classList.add('bg-white','text-black','border-white');
+                    btn.classList.remove('bg-transparent','text-gray-400','border-gray-800');
+                } else {
+                    btn.classList.remove('bg-white','text-black','border-white');
+                    btn.classList.add('bg-transparent','text-gray-400','border-gray-800');
+                }
+            });
+        }
+        
+        function initCursor() {
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', (e) => { cursorDot.style.left = `${e.clientX}px`; cursorDot.style.top = `${e.clientY}px`; cursorOutline.animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 500, fill: "forwards" }); });
+            document.querySelectorAll('a, button, .cursor-hover, [data-cursor], .product-card').forEach(el => {
+                el.addEventListener('mouseenter', () => { cursorOutline.classList.add('hovered'); if(el.dataset.cursor === '-lg') cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)'; });
+                el.addEventListener('mouseleave', () => { cursorOutline.classList.remove('hovered'); cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)'; });
+            });
+        }
+        
+        function initMagneticButtons() {
+            document.querySelectorAll('.magnetic-wrap').forEach((magnet) => {
+                magnet.addEventListener('mousemove', (e) => { const b = magnet.getBoundingClientRect(); gsap.to(magnet, { x: ((e.clientX - b.left)/b.width - 0.5) * 20, y: ((e.clientY - b.top)/b.height - 0.5) * 20, duration: 0.6, ease: 'power2.out' }); });
+                magnet.addEventListener('mouseleave', () => gsap.to(magnet, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' }));
+            });
+        }
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
