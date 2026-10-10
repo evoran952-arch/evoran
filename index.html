@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EVORAN - Premium Streetwear</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co.com/3mYYHXh5/image.png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -29,7 +32,7 @@
         h1, h2, h3, .brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
-        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; opacity: 0.05; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzPMzMxloWs2AAAACHRSTlMAMwA3M8zMzJ31F4rOAAABsklEQVQ4y2NgQAX8/PyYwHwGBob///8L/v//D+Qz/P//nwHEB/IZGP7/Z4D4//8zwXwGhv///zPA+P///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2cAAgAAAP//7Vk72W7DAAAAAElFTkSuQmCC'); }
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; opacity: 0.05; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzPMzMxloWs2AAAACHRSTlMAMwA3M8zMzJ31F4rOAAABsklEQVQ4y2NgQAX8/PyYwHwGBob///8L/v//D+Qz/P//nwHEB/IZGP7/Z4D4//8zwXwGhv///zPA+P///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2cAAgAAAP//7Vk72W7DAAAAAElFTkSuQmCC'); }
         .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
         .cursor-dot { width: 8px; height: 8px; background-color: white; }
         .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.5); transition: width 0.2s, height 0.2s, background-color 0.2s; }
@@ -65,7 +68,6 @@
             text-shadow: 0 0 12px rgba(255, 0, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5);
         }
 
-        /* Subtle Premium Hero Animation without heavy scaling */
         @keyframes subtleZoom {
             0% { transform: scale(1); }
             50% { transform: scale(1.03); }
@@ -93,7 +95,7 @@
     </div>
     
     <!-- Notification -->
-    <div id="notification" class="fixed top-24 right-5 text-white bg-black/80 backdrop-blur border border-red-900/50 px-6 py-4 rounded z-50 transform translate-x-full transition-transform duration-500 flex items-center gap-3 shadow-2xl shadow-red-900/20">
+    <div id="notification" class="fixed top-24 right-5 text-white bg-black/90 backdrop-blur border border-red-900/50 px-6 py-4 rounded z-50 translate-x-[150%] transition-transform duration-500 flex items-center gap-3 shadow-2xl shadow-red-900/20 pointer-events-none">
         <span id="notification-icon" class="text-red-500"></span>
         <span id="notification-message" class="font-medium tracking-wide"></span>
     </div>
@@ -103,7 +105,7 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             
             <div class="cursor-pointer flex items-center gap-2 md:gap-3 magnetic-wrap" onclick="navigateTo('home')" data-cursor="-lg">
-                <img src="evoranlogo.jpg" alt="EVORAN Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain rounded-md">
+                <img src="https://i.ibb.co.com/3mYYHXh5/image.png" alt="EVORAN Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain">
                 <span class="text-xl md:text-3xl font-black tracking-[0.2em] uppercase leading-none relative group block">
                     EVO<span class="text-red-600 group-hover:text-white transition-colors duration-300">RAN</span>
                 </span>
@@ -187,10 +189,7 @@
             <div class="relative h-[80vh] md:h-screen flex items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 z-0 bg-black">
                     <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black z-10"></div>
-                   <video id="hero-bg" class="w-full h-full object-cover object-top md:object-center hero-bg-anim" autoplay loop muted playsinline>
-    <source src="hero-animation.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+                    <img src="https://i.ibb.co.com/215CzPkf/image.png" alt="EVORAN Hero Banner" class="w-full h-full object-cover object-center hero-bg-anim">
                 </div>
                 <div class="relative z-20 text-center px-4 mt-16 md:mt-0">
                     <p class="text-sm md:text-base font-bold tracking-[0.5em] text-red-500 mb-4 opacity-0 hero-anim drop-shadow-xl">EST. 2026</p>
@@ -429,14 +428,21 @@
 
     <footer class="bg-[#050505] border-t border-gray-900 pt-20 pb-10 px-6 relative z-20">
         <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
-            <img src="evoranlogo.jpg" alt="EVORAN Logo" class="w-16 h-16 mb-6 object-contain rounded-lg">
+            <img src="https://i.ibb.co.com/3mYYHXh5/image.png" alt="EVORAN Logo" class="w-16 h-16 mb-6 object-contain">
             
-            <h2 class="text-7xl md:text-9xl font-black text-gray-900 uppercase tracking-tighter mb-8 select-none hover:text-red-900 transition-colors duration-500 cursor-default">EVORAN</h2>
-            <div class="flex gap-8 mb-12">
-                <a href="https://www.youtube.com/@Evoran-r2c" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors"><i data-lucide="youtube" class="w-6 h-6"></i></a>
-                <a href="https://www.facebook.com/profile.php?id=61581798921211" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+            <h2 class="text-7xl md:text-9xl font-black text-gray-900 uppercase tracking-tighter mb-6 select-none hover:text-red-900 transition-colors duration-500 cursor-default">EVORAN</h2>
+            
+            <!-- YouTube & Facebook Custom Image Icons Section -->
+            <div class="flex items-center justify-center gap-8 mb-8 relative z-30">
+                <a href="https://www.youtube.com/@Evoran-r2c" target="_blank" rel="noopener noreferrer" class="group transition-transform duration-300 hover:scale-110">
+                    <img src="https://i.ibb.co.com/RKBk9mm/YT.png" alt="YouTube" class="w-12 h-12 md:w-14 md:h-14 object-contain">
+                </a>
+                <a href="https://www.facebook.com/evoranofficial" target="_blank" rel="noopener noreferrer" class="group transition-transform duration-300 hover:scale-110">
+                    <img src="https://i.ibb.co.com/JR6yZXLM/FB.png" alt="Facebook" class="w-12 h-12 md:w-14 md:h-14 object-contain">
+                </a>
             </div>
-            <p class="text-xs text-gray-600 uppercase tracking-widest">© 2026 EVORAN. Premium Streetwear. All Rights Reserved.</p>
+
+            <p class="text-xs text-gray-600 uppercase tracking-widest">© 2026 EVORAN. PREMIUM STREETWEAR. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
@@ -507,17 +513,6 @@
         }
 
         function initScrollAnimations() {
-            gsap.to("#hero-bg", {
-                yPercent: 20,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: "#home-page",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
-
             document.querySelectorAll('.gsap-fade-up').forEach((el) => {
                 gsap.fromTo(el, 
                     { y: 40, opacity: 0 },
@@ -852,7 +847,7 @@
         
         function checkoutWhatsApp() { if (state.cart.length === 0) return; const msg = state.cart.map(i => `${i.name} (x${i.quantity}) - ৳${i.price * i.quantity}`).join('%0A'); const total = state.cart.reduce((sum, i) => sum + (i.price * i.quantity), 0); window.open(`https://wa.me/8801604954097?text=New Order:%0A${msg}%0A%0ATotal: ৳${total}`, '_blank'); }
         
-        function showNotification(msg) { const notif = document.getElementById('notification'); document.getElementById('notification-message').innerText = msg; document.getElementById('notification-icon').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>'; lucide.createIcons(); gsap.to(notif, { x: 0, duration: 0.5, ease: 'back.out(1.7)' }); setTimeout(() => gsap.to(notif, { x: '120%', duration: 0.5, ease: 'power2.in' }), 3000); }
+        function showNotification(msg) { const notif = document.getElementById('notification'); document.getElementById('notification-message').innerText = msg; document.getElementById('notification-icon').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>'; lucide.createIcons(); gsap.to(notif, { x: 0, duration: 0.5, ease: 'back.out(1.7)' }); setTimeout(() => gsap.to(notif, { x: '150%', duration: 0.5, ease: 'power2.in' }), 3000); }
         
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
         
