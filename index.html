@@ -32,7 +32,7 @@
         h1, h2, h3, .brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
-        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; opacity: 0.05; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzPMzMxloWs2AAAACHRSTlMAMwA3M8zMzJ31F4rOAAABsklEQVQ4y2NgQAX8/PyYwHwGBob///8L/v//D+Qz/P//nwHEB/IZGP7/Z4D4//8zwXwGhv///zPA+P///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2cAAgAAAP//7Vk72W7DAAAAAElFTkSuQmCC'); }
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; opacity: 0.05; background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzPMzMxloWs2AAAACHRSTlMAMwA3M8zMzJ31F4rOAAABsklEQVQ4y2NgQAX8/PyYwHwGBob///8L/v//D+Qz/P//nwHEB/IZGP7/Z4D4//8zwXwGhv///zPA+P///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2eA8f///2cAAgAAAP//7Vk72W7DAAAAAElFTkSuQmCC'); }
         .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
         .cursor-dot { width: 8px; height: 8px; background-color: white; }
         .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.5); transition: width 0.2s, height 0.2s, background-color 0.2s; }
@@ -145,13 +145,13 @@
 
     <!-- Product Modal -->
     <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-500">
-        <div class="bg-[#0a0a0a] text-white w-full h-full md:h-auto md:max-w-5xl md:border md:border-gray-800 overflow-hidden flex flex-col md:flex-row relative">
+        <div class="bg-[#0a0a0a] text-white w-full h-full md:h-auto md:max-w-5xl md:border md:border-gray-800 overflow-y-auto md:overflow-hidden flex flex-col md:flex-row relative max-h-[90vh]">
             <button onclick="closeProductModal()" class="absolute top-6 right-6 z-10 text-white mix-blend-difference hover:rotate-90 transition-transform duration-300" data-cursor="-lg"><i data-lucide="x" class="w-8 h-8"></i></button>
-            <div class="w-full md:w-1/2 h-1/2 md:h-[80vh] bg-gray-900 overflow-hidden relative group">
+            <div class="w-full md:w-1/2 h-72 md:h-[80vh] bg-gray-900 overflow-hidden relative group shrink-0">
                 <img id="modal-image" src="" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50"></div>
             </div>
-            <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-[#0a0a0a]">
+            <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-[#0a0a0a] overflow-y-auto">
                 <span class="text-red-600 font-bold tracking-[0.3em] text-xs mb-4 block animate-slide-up">EVORAN EXCLUSIVE</span>
                 <h2 id="modal-name" class="text-4xl md:text-6xl font-black mb-4 uppercase leading-none animate-slide-up"></h2>
                 <p id="modal-price" class="text-2xl md:text-3xl text-gray-400 font-light mb-8 animate-slide-up"></p>
@@ -189,7 +189,7 @@
             <div class="relative h-[80vh] md:h-screen flex items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 z-0 bg-black">
                     <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black z-10"></div>
-                    <img src="https://i.ibb.co.com/215CzPkf/image.png" alt="EVORAN Hero Banner" class="w-full h-full object-cover object-center hero-bg-anim">
+                    <img src="https://i.ibb.co.com/215CzPkf/image.png" alt="EVORAN Hero Banner" class="w-full h-full object-cover object-right md:object-center hero-bg-anim"[cite: 1]>
                 </div>
                 <div class="relative z-20 text-center px-4 mt-16 md:mt-0">
                     <p class="text-sm md:text-base font-bold tracking-[0.5em] text-red-500 mb-4 opacity-0 hero-anim drop-shadow-xl">EST. 2026</p>
@@ -779,11 +779,17 @@
             modal.classList.remove('pointer-events-none');
             gsap.to(modal, { opacity: 1, duration: 0.3 });
             gsap.fromTo('.animate-slide-up', { y: 30, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, delay: 0.2 });
+
+            if (typeof lenis !== 'undefined') lenis.stop();
+            document.body.style.overflow = 'hidden';
         }
 
         function closeProductModal() {
             const modal = document.getElementById('product-modal');
             gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => modal.classList.add('pointer-events-none') });
+
+            if (typeof lenis !== 'undefined') lenis.start();
+            document.body.style.overflow = 'auto';
         }
 
         function increaseModalQuantity() { state.modalQuantity++; document.getElementById('modal-quantity').innerText = state.modalQuantity; updateModalButtonText(); }
